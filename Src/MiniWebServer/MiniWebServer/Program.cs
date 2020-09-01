@@ -1,10 +1,12 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 
 namespace MiniWebServer
 {
     class Program
     {
+        public string Value { get; set; }
         static void Main(string[] args)
         {
             string[] test = new string[1];
@@ -13,9 +15,15 @@ namespace MiniWebServer
             SimpleListenerExample(test);
         }
 
+        public static string NextCustomerID()
+{
+    // A real-world application would do something more robust
+    // to ensure uniqueness.
+    return DateTime.Now.ToString();
+}
         public static string ReturnIndexHTML()
         {
-            string path = @"C:\dev\webserver2-grupp4\Content\index.html";
+            string path = @"C:\Users\willi\Dev\webserver2-grupp4\Content\index.html";
             string text = System.IO.File.ReadAllText(path);
 
             return text;
@@ -43,10 +51,24 @@ namespace MiniWebServer
 
             HttpListenerContext context = listener.GetContext();
             HttpListenerRequest request = context.Request;
+            string customerID = null;
+
+            Cookie cookie = request.Cookies["ID"];
+            if (cookie != null)
+                customerID = cookie.Value;
+            if (customerID != null)
+                Console.WriteLine("Found the Cookie!");
 
             HttpListenerResponse response = context.Response;
 
-            string responseString = ReturnIndexHTML();
+            if(customerID == null)
+            {
+                customerID = NextCustomerID();
+                Cookie cook = new Cookie("ID", customerID);
+                response.AppendCookie(cook);
+            }
+
+            string responseString = ReturnIndexHTML() + customerID;
             byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
 
             response.ContentLength64 = buffer.Length;
