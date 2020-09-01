@@ -12,6 +12,15 @@ namespace MiniWebServer
 
             SimpleListenerExample(test);
         }
+
+        public static string ReturnIndexHTML()
+        {
+            string path = @"C:\dev\webserver2-grupp4\Content\index.html";
+            string text = System.IO.File.ReadAllText(path);
+
+            return text;
+        }
+
         public static void SimpleListenerExample(string[] prefixes)
         {
             if (!HttpListener.IsSupported)
@@ -37,7 +46,7 @@ namespace MiniWebServer
 
             HttpListenerResponse response = context.Response;
 
-            string responseString = "<HTML><BODY>Hello world!</BODY></HTML>";
+            string responseString = ReturnIndexHTML();
             byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
 
             response.ContentLength64 = buffer.Length;
